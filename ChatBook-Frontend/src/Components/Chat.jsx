@@ -2,6 +2,7 @@ import { Button } from "@mui/material";
 import { Send } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import openSocket from "socket.io-client";
+const backendAPI = import.meta.env.VITE_BACKEND_API;
 
 export default function Chat() {
   const [myMessages, setMyMessages] = useState(null);
@@ -10,9 +11,9 @@ export default function Chat() {
   const [isChangingUserName, setIsChangingUserName] = useState(false);
 
   useEffect(() => {
-    const socket = openSocket("http://localhost:3000");
+    const socket = openSocket(`${backendAPI}`);
     async function getMessages() {
-      const response = await fetch("http://localhost:3000");
+      const response = await fetch(`${backendAPI}`);
       if (!response.ok) {
         console.log("Error ocured while fetching messages!");
       } else {
@@ -47,7 +48,7 @@ export default function Chat() {
       message: text,
     };
     try {
-      const response = await fetch("http://localhost:3000/", {
+      const response = await fetch(`${backendAPI}/`, {
         method: "post",
         headers: {
           "Content-Type": "application/json",
