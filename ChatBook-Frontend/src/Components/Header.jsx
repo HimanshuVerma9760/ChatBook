@@ -130,17 +130,12 @@ export default function Header() {
                           <Search sx={{ marginRight: "10px" }} />
                         </InputAdornment>
                       }
+                      disableUnderline
                       sx={{
                         border: "transparent",
                         width: "30rem",
                         borderRadius: "1.8rem",
                         backgroundColor: "white",
-                        "&:before, &:after": {
-                          borderBottom: "none",
-                        },
-                        "&:hover:not(.Mui-disabled):before": {
-                          borderBottom: "none",
-                        },
                         paddingLeft: "1rem",
                         fontSize: "15px",
                         height: "2.5rem",
@@ -228,8 +223,8 @@ export default function Header() {
               {DrawerList}
             </Drawer>
           </Box>
-          <Box sx={{ marginTop: "1rem", padding: "1rem", width: "100%" }}>
-            <Grid2 container>
+          <Box sx={{ marginTop: "1rem", padding: "1rem"}}>
+            <Grid2 width="100%">
               <Outlet />
             </Grid2>
           </Box>

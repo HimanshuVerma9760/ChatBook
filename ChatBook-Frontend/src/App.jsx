@@ -2,10 +2,11 @@ import Chat from "./Components/Chat";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Header from "./Components/Header";
 import { ThemeProvider } from "@emotion/react";
-import { theme } from "./Theme.js";
+import { theme } from "./utils/Theme.js";
 import Dashboard from "./Components/Dashboard.jsx";
 import Homepage from "./Components/Homepage.jsx";
-import Login from "./Components/Login.jsx";
+import SignUp from "./Components/SignUp.jsx";
+import FormAction from "./utils/FormAction.js";
 
 function App() {
   const routes = createBrowserRouter([
@@ -22,8 +23,9 @@ function App() {
           element: <Dashboard />,
         },
         {
-          path: "/login",
-          element: <Login />,
+          path: "/sign-up",
+          action: FormAction,
+          element: <SignUp />,
         },
       ],
     },
