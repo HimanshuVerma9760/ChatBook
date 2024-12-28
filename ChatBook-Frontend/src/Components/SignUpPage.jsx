@@ -2,6 +2,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
   Box,
   Button,
+  Divider,
   FormControl,
   FormLabel,
   Grid2,
@@ -10,9 +11,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form, Link, useActionData } from "react-router-dom";
 import { motion } from "framer-motion";
+import Footer from "./Footer";
 
 export default function SignUpPage() {
   const response = useActionData() || {};
@@ -44,7 +46,35 @@ export default function SignUpPage() {
   const [incompleteForm, setIncompleteForm] = useState(true);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    setName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setNameError({
+      value: false,
+      message: "",
+    });
+    setEmailError({
+      value: false,
+      message: "",
+    });
+    setPasswordError({
+      value: false,
+      message: "",
+    });
+    setConfirmPasswordError({
+      value: false,
+      message: "",
+    });
+    setPasswordVisible(false);
+    setPassType("password");
+    setIncompleteForm(true);
+    setError("");
+  }, [message]);
+
   function onChangeHandler(event) {
+    setError("");
     const id = event.target.id;
     const value = event.target.value;
     switch (id) {
@@ -116,14 +146,15 @@ export default function SignUpPage() {
           const nameArr = inputValue.split("");
           for (const ch of nameArr) {
             if (!isNaN(ch)) {
-              !incompleteForm && setIncompleteForm(true);
-              setNameError(() => {
-                return {
-                  value: true,
-                  message: "Name must not contain a number!",
-                };
-              });
-              break;
+              if (ch !== " ") {
+                !incompleteForm && setIncompleteForm(true);
+                setNameError(() => {
+                  return {
+                    value: true,
+                    message: "Name must not contain a number!",
+                  };
+                });
+              }
             }
           }
         }
@@ -208,8 +239,7 @@ export default function SignUpPage() {
     ) {
       setError("Incomplete");
       event.preventDefault();
-    }else{
-
+    } else {
     }
   }
 
@@ -218,24 +248,53 @@ export default function SignUpPage() {
       <Box
         sx={{
           display: "flex",
-          flexDirection: "row",
+          flexDirection: { xs: "column", sm: "row" },
           alignItems: "center",
-          gap: "5rem",
+          gap: { xs: "2.5rem", sm: "5rem" },
           color: "#4B0082",
+          overflow: "hidden",
         }}
       >
-        <Box sx={{ textAlign: "center", width: "50%" }}>
-          <Grid2 sx={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+        <Box sx={{ textAlign: "center", width: { xs: "100%", sm: "50%" } }}>
+          <Grid2
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: { xs: "0.5rem", sm: "2rem" },
+            }}
+          >
             <Grid2>
-              <Typography variant="h3">Welcome to ChatBook!</Typography>
-              <Typography variant="p">
+              <Typography
+                variant="h3"
+                sx={{
+                  fontSize: { xs: "26px", sm: "45px" },
+                  fontWeight: "bold",
+                }}
+              >
+                Welcome to ChatBook!
+              </Typography>
+              <Typography
+                variant="p"
+                sx={{ fontSize: { xs: "11.5px", sm: "20px" } }}
+              >
                 We’re excited to have you join us. Please sign up to get started
                 and explore all the features we offer.
               </Typography>
             </Grid2>
             <Grid2>
-              <Typography variant="h5">Already have an account?</Typography>
-              <Link to="/login">Login here</Link>
+              <Typography
+                variant="h5"
+                fontWeight={580}
+                sx={{ fontSize: { sm: "32px", xs: "18px" } }}
+              >
+                Already have an account?
+              </Typography>
+              <Typography
+                variant="p"
+                sx={{ fontSize: { xs: "13px", sm: "15px" } }}
+              >
+                <Link to="/login">Login here</Link>
+              </Typography>
             </Grid2>
             {message && (
               <Typography variant="p" color="error">
@@ -248,7 +307,11 @@ export default function SignUpPage() {
           <Grid2 alignItems="center" alignContent="center">
             <Grid2 display="flex" flexDirection="column" gap="2rem">
               <Grid2>
-                <FormLabel sx={{ fontSize: "2rem" }}>Sign Up</FormLabel>
+                <Typography align="center">
+                  <FormLabel sx={{ fontSize: { xs: "1.5rem", sm: "2rem" } }}>
+                    Sign Up
+                  </FormLabel>
+                </Typography>
               </Grid2>
               <Grid2>
                 <Form method="post">
@@ -257,7 +320,7 @@ export default function SignUpPage() {
                       display: "flex",
                       flexDirection: "column",
                       gap: "1rem",
-                      width: "30rem",
+                      width: { xs: "20rem", sm: "30rem" },
                     }}
                   >
                     <FormControl
@@ -265,9 +328,12 @@ export default function SignUpPage() {
                       fullWidth
                       sx={{ gap: "10px" }}
                     >
-                      <label style={{ fontSize: "20px" }}>Full Name</label>
+                      <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                        Full Name
+                      </label>
                       <TextField
                         onBlur={() => checkInputValidity(name, "name")}
+                        autoComplete="off"
                         label={
                           nameError.value ? nameError.message : "Full Name"
                         }
@@ -287,8 +353,11 @@ export default function SignUpPage() {
                       fullWidth
                       sx={{ gap: "10px" }}
                     >
-                      <label style={{ fontSize: "20px" }}>Email</label>
+                      <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                        Email
+                      </label>
                       <TextField
+                        autoComplete="off"
                         onBlur={() => checkInputValidity(email, "email")}
                         label={emailError.value ? emailError.message : "Email"}
                         type="email"
@@ -308,7 +377,9 @@ export default function SignUpPage() {
                       fullWidth
                       sx={{ gap: "10px" }}
                     >
-                      <label style={{ fontSize: "20px" }}>Password</label>
+                      <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                        Password
+                      </label>
                       <TextField
                         onBlur={() => checkInputValidity(password, "password")}
                         label={
@@ -351,7 +422,7 @@ export default function SignUpPage() {
                       fullWidth
                       sx={{ gap: "10px" }}
                     >
-                      <label style={{ fontSize: "20px" }}>
+                      <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
                         Confirm Password
                       </label>
                       <TextField
@@ -391,6 +462,10 @@ export default function SignUpPage() {
             </Grid2>
           </Grid2>
         </Box>
+      </Box>
+      <Divider sx={{marginTop:"2rem"}}/>
+      <Box sx={{ marginTop: "2rem" }}>
+        <Footer />
       </Box>
     </>
   );

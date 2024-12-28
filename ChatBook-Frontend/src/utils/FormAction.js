@@ -5,10 +5,8 @@ export default async function FormAction({ request }) {
   try {
     const newUserData = await request.formData();
     const form = {
-      userName: newUserData.get("userName"), // generate it uniquely here.
       fullName: newUserData.get("fullName"),
       userEmail: newUserData.get("userEmail"),
-      userPhone: newUserData.get("userPhone"),
       userPassword: newUserData.get("userPassword"),
     };
     console.log(form);
@@ -23,7 +21,8 @@ export default async function FormAction({ request }) {
       if (!response.ok) {
         return { message: "Some error occured while saving data!" };
       } else {
-        return { message: "Successfully Added!" };
+        const backendResponse=await response.json();
+        return { message: backendResponse.message };
       }
     } else {
       return { message: "No response from server!" };

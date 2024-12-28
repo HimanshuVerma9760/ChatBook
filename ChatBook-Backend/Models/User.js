@@ -1,4 +1,5 @@
-const { default: mongoose, Schema } = require("mongoose");
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 const UserSchema = new Schema(
   {
@@ -14,15 +15,29 @@ const UserSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
+      minlength: 3, 
+      maxlength: 10,
     },
-    password: {
+    fullName: {
       type: String,
       required: true,
-    }, // Store hashed passwords
+      trim: true,
+      minlength: 3, 
+    },
+    userPassword: {
+      type: String,
+      required: true,
+    },
     createdAt: {
       type: Date,
       default: Date.now,
     },
+    friends: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     timestamps: true,

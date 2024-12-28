@@ -1,12 +1,15 @@
 import {
   Box,
   Button,
+  Divider,
   FormControl,
+  FormLabel,
   Grid2,
   TextField,
   Typography,
 } from "@mui/material";
 import { Form, Link, useActionData } from "react-router-dom";
+import Footer from "./Footer";
 
 export default function LoginPage() {
   const response = useActionData || {};
@@ -19,22 +22,51 @@ export default function LoginPage() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: "5rem",
+          gap: { xs: "5rem", sm: "4rem" },
           color: "#4B0082",
         }}
       >
-        <Box sx={{ textAlign: "center", width: "50%" }}>
-          <Grid2 sx={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+        <Box sx={{ textAlign: "center", width: { xs: "100%", sm: "50%" } }}>
+          <Grid2
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: { xs: "1.5rem", sm: "1rem" },
+            }}
+          >
             <Grid2>
-              <Typography variant="h3">Welcome to ChatBook!</Typography>
-              <Typography variant="p">
+              <Typography
+                variant="h3"
+                sx={{
+                  fontSize: { xs: "26px", sm: "45px" },
+                  fontWeight: "bold",
+                }}
+              >
+                Welcome to ChatBook!
+              </Typography>
+              <Typography
+                variant="p"
+                sx={{ fontSize: { xs: "11.5px", sm: "20px" } }}
+              >
                 We’re excited to have you back with us. Please login to get
                 started and explore all new features.
               </Typography>
             </Grid2>
-            <Grid2>
-              <Typography variant="h5">Don't have an account?</Typography>
-              <Link to="/sign-up">Sign-up</Link>
+            <Grid2 display="flex" justifyContent="center" alignItems="baseline">
+              <Typography
+                variant="h5"
+                fontWeight={580}
+                sx={{ fontSize: { sm: "32px", xs: "18px" } }}
+                align="center"
+              >
+                Don't have an account?
+              </Typography>
+              <Typography
+                variant="p"
+                sx={{ fontSize: { xs: "13px", sm: "15px" }, marginLeft:'0.5rem'}}
+              >
+                <Link to="/sign-up">Create Account</Link>
+              </Typography>
             </Grid2>
             {message && (
               <Typography variant="p" color="error">
@@ -46,9 +78,13 @@ export default function LoginPage() {
         <Box>
           <Grid2 alignItems="center" alignContent="center">
             <Grid2 display="flex" flexDirection="column" gap="2rem">
-              {/* <Grid2>
-                <FormLabel sx={{ fontSize: "2rem" }}>Log in</FormLabel>
-              </Grid2> */}
+              <Grid2>
+                <Typography align="center">
+                <FormLabel sx={{ fontSize: { xs: "1.5rem", sm: "2rem" } }}>
+                  Log in
+                </FormLabel>
+                </Typography>
+              </Grid2>
               <Grid2>
                 <Form method="post">
                   <Grid2
@@ -56,7 +92,7 @@ export default function LoginPage() {
                       display: "flex",
                       flexDirection: "column",
                       gap: "1rem",
-                      width: "30rem",
+                      width: { xs: "20rem", sm: "30rem" },
                     }}
                   >
                     <FormControl
@@ -64,13 +100,14 @@ export default function LoginPage() {
                       fullWidth
                       sx={{ gap: "10px" }}
                     >
-                      <label style={{ fontSize: "20px" }}>
-                        Phone or Username
+                      <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                        Email
                       </label>
                       <TextField
-                        label="Phone or Username"
-                        id="firstName"
-                        name="firstName"
+                        label="Email"
+                        type="email"
+                        id="userEmail"
+                        name="userEmail"
                         sx={{
                           backgroundColor: "white",
                           borderRadius: "8px",
@@ -82,7 +119,9 @@ export default function LoginPage() {
                       fullWidth
                       sx={{ gap: "10px" }}
                     >
-                      <label style={{ fontSize: "20px" }}>Password</label>
+                      <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                        Password
+                      </label>
                       <TextField
                         type="password"
                         label="Password"
@@ -103,6 +142,10 @@ export default function LoginPage() {
             </Grid2>
           </Grid2>
         </Box>
+      </Box>
+      <Divider sx={{ marginTop: "2rem" }} />
+      <Box sx={{ marginTop: "2rem" }}>
+        <Footer />
       </Box>
     </>
   );
