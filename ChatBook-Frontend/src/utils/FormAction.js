@@ -5,12 +5,11 @@ export default async function FormAction({ request }) {
   try {
     const newUserData = await request.formData();
     const form = {
-      userName: newUserData.get("userName"),
-      firstName: newUserData.get("firstName"),
-      lastName: newUserData.get("lastName"),
+      userName: newUserData.get("userName"), // generate it uniquely here.
+      fullName: newUserData.get("fullName"),
       userEmail: newUserData.get("userEmail"),
       userPhone: newUserData.get("userPhone"),
-      userPassword: newUserData.get("userPWD"),
+      userPassword: newUserData.get("userPassword"),
     };
     console.log(form);
     response = await fetch(`${backendAPI}/add-new-user`, {

@@ -5,8 +5,10 @@ import { ThemeProvider } from "@emotion/react";
 import { theme } from "./utils/Theme.js";
 import Dashboard from "./Components/Dashboard.jsx";
 import Homepage from "./Components/Homepage.jsx";
-import SignUp from "./Components/SignUp.jsx";
+import SignUpPage from "./Components/SignUpPage.jsx";
 import FormAction from "./utils/FormAction.js";
+import LoginPage from "./Components/LoginPage.jsx";
+import LoginAction from "./utils/LoginAction.js";
 
 function App() {
   const routes = createBrowserRouter([
@@ -25,7 +27,12 @@ function App() {
         {
           path: "/sign-up",
           action: FormAction,
-          element: <SignUp />,
+          element: <SignUpPage />,
+        },
+        {
+          path: "/login",
+          action: LoginAction,
+          element: <LoginPage />,
         },
       ],
     },

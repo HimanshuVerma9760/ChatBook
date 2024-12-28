@@ -60,8 +60,8 @@ export default function Header() {
     <Box width={250} role="presentation">
       <List>
         {optionArray.map((IconComponent, index) => (
-          <motion.div whileHover={{ scale: 1.1 }}>
-            <ListItem key={index}>
+          <motion.div whileHover={{ scale: 1.1 }} key={index}>
+            <ListItem>
               <ListItemButton>
                 <Link
                   to={IconComponent.to}
@@ -126,7 +126,7 @@ export default function Header() {
                       type="search"
                       placeholder="Search"
                       startAdornment={
-                        <InputAdornment>
+                        <InputAdornment position="start">
                           <Search sx={{ marginRight: "10px" }} />
                         </InputAdornment>
                       }
@@ -223,7 +223,7 @@ export default function Header() {
               {DrawerList}
             </Drawer>
           </Box>
-          <Box sx={{ marginTop: "1rem", padding: "1rem"}}>
+          <Box sx={{ marginTop: "1rem", padding: "1rem" }}>
             <Grid2 width="100%">
               <Outlet />
             </Grid2>

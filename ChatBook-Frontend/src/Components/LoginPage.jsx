@@ -2,40 +2,39 @@ import {
   Box,
   Button,
   FormControl,
-  FormLabel,
   Grid2,
   TextField,
   Typography,
 } from "@mui/material";
 import { Form, Link, useActionData } from "react-router-dom";
 
-export default function Login() {
-  const response = useActionData() || {};
-  const message = response.message || null;
+export default function LoginPage() {
+  const response = useActionData || {};
+  const message = response.message || "";
 
   return (
     <>
       <Box
         sx={{
           display: "flex",
-          flexDirection: "row",
+          flexDirection: "column",
           alignItems: "center",
           gap: "5rem",
           color: "#4B0082",
         }}
       >
-        <Box sx={{ textAlign: "center" }}>
+        <Box sx={{ textAlign: "center", width: "50%" }}>
           <Grid2 sx={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
             <Grid2>
-              <Typography variant="h3">Welcome to Our Application!</Typography>
+              <Typography variant="h3">Welcome to ChatBook!</Typography>
               <Typography variant="p">
-                We’re excited to have you join us. Please sign up to get started
-                and explore all the features we offer.
+                We’re excited to have you back with us. Please login to get
+                started and explore all new features.
               </Typography>
             </Grid2>
             <Grid2>
-              <Typography variant="h5">Already have an account?</Typography>
-              <Link to="/login">Login here</Link>
+              <Typography variant="h5">Don't have an account?</Typography>
+              <Link to="/sign-up">Sign-up</Link>
             </Grid2>
             {message && (
               <Typography variant="p" color="error">
@@ -47,9 +46,9 @@ export default function Login() {
         <Box>
           <Grid2 alignItems="center" alignContent="center">
             <Grid2 display="flex" flexDirection="column" gap="2rem">
-              <Grid2>
-                <FormLabel sx={{ fontSize: "2rem" }}>Sign Up</FormLabel>
-              </Grid2>
+              {/* <Grid2>
+                <FormLabel sx={{ fontSize: "2rem" }}>Log in</FormLabel>
+              </Grid2> */}
               <Grid2>
                 <Form method="post">
                   <Grid2
@@ -65,9 +64,11 @@ export default function Login() {
                       fullWidth
                       sx={{ gap: "10px" }}
                     >
-                      <label style={{ fontSize: "20px" }}>First Name</label>
+                      <label style={{ fontSize: "20px" }}>
+                        Phone or Username
+                      </label>
                       <TextField
-                        label="First Name"
+                        label="Phone or Username"
                         id="firstName"
                         name="firstName"
                         sx={{
@@ -81,43 +82,12 @@ export default function Login() {
                       fullWidth
                       sx={{ gap: "10px" }}
                     >
-                      <label style={{ fontSize: "20px" }}>Last Name</label>
+                      <label style={{ fontSize: "20px" }}>Password</label>
                       <TextField
-                        label="Last Name"
-                        id="lastName"
-                        name="lastName"
-                        sx={{
-                          backgroundColor: "white",
-                          borderRadius: "8px",
-                        }}
-                      />
-                    </FormControl>
-                    <FormControl
-                      variant="standard"
-                      fullWidth
-                      sx={{ gap: "10px" }}
-                    >
-                      <label style={{ fontSize: "20px" }}>Email</label>
-                      <TextField
-                        label="Email"
-                        id="userEmail"
-                        name="userEmail"
-                        sx={{
-                          backgroundColor: "white",
-                          borderRadius: "8px",
-                        }}
-                      />
-                    </FormControl>
-                    <FormControl
-                      variant="standard"
-                      fullWidth
-                      sx={{ gap: "10px" }}
-                    >
-                      <label style={{ fontSize: "20px" }}>Contact</label>
-                      <TextField
-                        label="Phone"
-                        id="userPhone"
-                        name="userPhone"
+                        type="password"
+                        label="Password"
+                        id="userPassword"
+                        name="userPassword"
                         sx={{
                           backgroundColor: "white",
                           borderRadius: "8px",
