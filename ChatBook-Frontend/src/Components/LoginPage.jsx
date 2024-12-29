@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { Form, Link, useActionData } from "react-router-dom";
 import Footer from "./Footer";
+import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const response = useActionData || {};
@@ -63,7 +64,10 @@ export default function LoginPage() {
               </Typography>
               <Typography
                 variant="p"
-                sx={{ fontSize: { xs: "13px", sm: "15px" }, marginLeft:'0.5rem'}}
+                sx={{
+                  fontSize: { xs: "13px", sm: "15px" },
+                  marginLeft: "0.5rem",
+                }}
               >
                 <Link to="/sign-up">Create Account</Link>
               </Typography>
@@ -77,69 +81,74 @@ export default function LoginPage() {
         </Box>
         <Box>
           <Grid2 alignItems="center" alignContent="center">
-            <Grid2 display="flex" flexDirection="column" gap="2rem">
-              <Grid2>
-                <Typography align="center">
-                <FormLabel sx={{ fontSize: { xs: "1.5rem", sm: "2rem" } }}>
-                  Log in
-                </FormLabel>
-                </Typography>
-              </Grid2>
-              <Grid2>
-                <Form method="post">
-                  <Grid2
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "1rem",
-                      width: { xs: "20rem", sm: "30rem" },
-                    }}
-                  >
-                    <FormControl
-                      variant="standard"
-                      fullWidth
-                      sx={{ gap: "10px" }}
+            <motion.div
+              initial={{ opacity: 0, x: -100 }}
+              animate={{ opacity: 1, x: 0 }}
+            >
+              <Grid2 display="flex" flexDirection="column" gap="2rem">
+                <Grid2>
+                  <Typography align="center">
+                    <FormLabel sx={{ fontSize: { xs: "1.5rem", sm: "2rem" } }}>
+                      Log in
+                    </FormLabel>
+                  </Typography>
+                </Grid2>
+                <Grid2>
+                  <Form method="post">
+                    <Grid2
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "1rem",
+                        width: { xs: "20rem", sm: "30rem" },
+                      }}
                     >
-                      <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
-                        Email
-                      </label>
-                      <TextField
-                        label="Email"
-                        type="email"
-                        id="userEmail"
-                        name="userEmail"
-                        sx={{
-                          backgroundColor: "white",
-                          borderRadius: "8px",
-                        }}
-                      />
-                    </FormControl>
-                    <FormControl
-                      variant="standard"
-                      fullWidth
-                      sx={{ gap: "10px" }}
-                    >
-                      <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
-                        Password
-                      </label>
-                      <TextField
-                        type="password"
-                        label="Password"
-                        id="userPassword"
-                        name="userPassword"
-                        sx={{
-                          backgroundColor: "white",
-                          borderRadius: "8px",
-                        }}
-                      />
-                    </FormControl>
-                  </Grid2>
-                  <Grid2 textAlign="center" marginTop="10px">
-                    <Button type="submit">Submit</Button>
-                  </Grid2>
-                </Form>
+                      <FormControl
+                        variant="standard"
+                        fullWidth
+                        sx={{ gap: "10px" }}
+                      >
+                        <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                          Email
+                        </label>
+                        <TextField
+                          label="Email"
+                          type="email"
+                          id="userEmail"
+                          name="userEmail"
+                          sx={{
+                            backgroundColor: "white",
+                            borderRadius: "8px",
+                          }}
+                        />
+                      </FormControl>
+                      <FormControl
+                        variant="standard"
+                        fullWidth
+                        sx={{ gap: "10px" }}
+                      >
+                        <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                          Password
+                        </label>
+                        <TextField
+                          type="password"
+                          label="Password"
+                          id="userPassword"
+                          name="userPassword"
+                          sx={{
+                            backgroundColor: "white",
+                            borderRadius: "8px",
+                          }}
+                        />
+                      </FormControl>
+                    </Grid2>
+                    <Grid2 textAlign="center" marginTop="10px">
+                      <Button type="submit">Submit</Button>
+                    </Grid2>
+                  </Form>
+                </Grid2>
               </Grid2>
-            </Grid2>
+            </motion.div>
           </Grid2>
         </Box>
       </Box>

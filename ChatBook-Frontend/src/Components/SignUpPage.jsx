@@ -44,7 +44,6 @@ export default function SignUpPage() {
   const [passType, setPassType] = useState("password");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [incompleteForm, setIncompleteForm] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     setName("");
@@ -70,11 +69,10 @@ export default function SignUpPage() {
     setPasswordVisible(false);
     setPassType("password");
     setIncompleteForm(true);
-    setError("");
   }, [message]);
 
   function onChangeHandler(event) {
-    setError("");
+    setIncompleteForm(false);
     const id = event.target.id;
     const value = event.target.value;
     switch (id) {
@@ -116,14 +114,6 @@ export default function SignUpPage() {
         break;
       default:
         break;
-    }
-    if (
-      nameError.value === false &&
-      emailError.value === false &&
-      passwordError.value === false &&
-      confirmPasswordError.value === false
-    ) {
-      setIncompleteForm(false);
     }
   }
   function isValidEmail(email) {
@@ -231,15 +221,17 @@ export default function SignUpPage() {
   }
 
   function beforeSubmitHandler(event) {
+    checkInputValidity(name, "name");
+    checkInputValidity(email, "email");
+    checkInputValidity(password, "password");
+    checkInputValidity(confirmPassword, "confirmPassword");
     if (
-      name.trim().length === 0 ||
-      email.trim().length === 0 ||
-      password.trim().length === 0 ||
-      confirmPassword.trim().length === 0
+      nameError.value ||
+      emailError.value ||
+      passwordError.value ||
+      confirmPasswordError.value
     ) {
-      setError("Incomplete");
       event.preventDefault();
-    } else {
     }
   }
 
@@ -304,166 +296,177 @@ export default function SignUpPage() {
           </Grid2>
         </Box>
         <Box>
-          <Grid2 alignItems="center" alignContent="center">
-            <Grid2 display="flex" flexDirection="column" gap="2rem">
-              <Grid2>
-                <Typography align="center">
-                  <FormLabel sx={{ fontSize: { xs: "1.5rem", sm: "2rem" } }}>
-                    Sign Up
-                  </FormLabel>
-                </Typography>
-              </Grid2>
-              <Grid2>
-                <Form method="post">
-                  <Grid2
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "1rem",
-                      width: { xs: "20rem", sm: "30rem" },
-                    }}
-                  >
-                    <FormControl
-                      variant="standard"
-                      fullWidth
-                      sx={{ gap: "10px" }}
+          <motion.div
+            initial={{ opacity: 0, y: -100 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Grid2 alignItems="center" alignContent="center">
+              <Grid2 display="flex" flexDirection="column" gap="2rem">
+                <Grid2>
+                  <Typography align="center">
+                    <FormLabel sx={{ fontSize: { xs: "1.5rem", sm: "2rem" } }}>
+                      Sign Up
+                    </FormLabel>
+                  </Typography>
+                </Grid2>
+                <Grid2>
+                  <Form method="post">
+                    <Grid2
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "1rem",
+                        width: { xs: "20rem", sm: "30rem" },
+                      }}
                     >
-                      <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
-                        Full Name
-                      </label>
-                      <TextField
-                        onBlur={() => checkInputValidity(name, "name")}
-                        autoComplete="off"
-                        label={
-                          nameError.value ? nameError.message : "Full Name"
-                        }
-                        error={nameError.value}
-                        id="fullName"
-                        name="fullName"
-                        value={name}
-                        onChange={(event) => onChangeHandler(event)}
-                        sx={{
-                          backgroundColor: "white",
-                          borderRadius: "8px",
-                        }}
-                      />
-                    </FormControl>
-                    <FormControl
-                      variant="standard"
-                      fullWidth
-                      sx={{ gap: "10px" }}
-                    >
-                      <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
-                        Email
-                      </label>
-                      <TextField
-                        autoComplete="off"
-                        onBlur={() => checkInputValidity(email, "email")}
-                        label={emailError.value ? emailError.message : "Email"}
-                        type="email"
-                        error={emailError.value}
-                        id="userEmail"
-                        value={email}
-                        name="userEmail"
-                        onChange={(event) => onChangeHandler(event)}
-                        sx={{
-                          backgroundColor: "white",
-                          borderRadius: "8px",
-                        }}
-                      />
-                    </FormControl>
-                    <FormControl
-                      variant="standard"
-                      fullWidth
-                      sx={{ gap: "10px" }}
-                    >
-                      <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
-                        Password
-                      </label>
-                      <TextField
-                        onBlur={() => checkInputValidity(password, "password")}
-                        label={
-                          passwordError.value
-                            ? passwordError.message
-                            : "Password"
-                        }
-                        type={passType}
-                        error={passwordError.value}
-                        value={password}
-                        id="userPassword"
-                        name="userPassword"
-                        autoComplete="off"
-                        onChange={(event) => onChangeHandler(event)}
-                        slotProps={{
-                          input: {
-                            endAdornment: (
-                              <motion.div whileHover={{ cursor: "pointer" }}>
-                                <InputAdornment position="end">
-                                  <IconButton onClick={visiblityHandler}>
-                                    {passwordVisible ? (
-                                      <Visibility />
-                                    ) : (
-                                      <VisibilityOff />
-                                    )}
-                                  </IconButton>
-                                </InputAdornment>
-                              </motion.div>
-                            ),
-                          },
-                        }}
-                        sx={{
-                          backgroundColor: "white",
-                          borderRadius: "8px",
-                        }}
-                      />
-                    </FormControl>
-                    <FormControl
-                      variant="standard"
-                      fullWidth
-                      sx={{ gap: "10px" }}
-                    >
-                      <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
-                        Confirm Password
-                      </label>
-                      <TextField
-                        onBlur={() =>
-                          checkInputValidity(confirmPassword, "confirmPassword")
-                        }
-                        label={
-                          confirmPasswordError.value
-                            ? confirmPasswordError.message
-                            : "Confirm Password"
-                        }
-                        error={confirmPasswordError.value}
-                        autoComplete="off"
-                        value={confirmPassword}
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        onChange={(event) => onChangeHandler(event)}
-                        sx={{
-                          backgroundColor: "white",
-                          borderRadius: "8px",
-                        }}
-                      />
-                    </FormControl>
-                  </Grid2>
-                  <Grid2 textAlign="center" marginTop="10px">
-                    <Button
-                      disabled={incompleteForm}
-                      type="submit"
-                      onClick={beforeSubmitHandler}
-                      color={error && "error"}
-                    >
-                      {error || "Submit"}
-                    </Button>
-                  </Grid2>
-                </Form>
+                      <FormControl
+                        variant="standard"
+                        fullWidth
+                        sx={{ gap: "10px" }}
+                      >
+                        <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                          Full Name
+                        </label>
+                        <TextField
+                          onBlur={() => checkInputValidity(name, "name")}
+                          autoComplete="off"
+                          label={
+                            nameError.value ? nameError.message : "Full Name"
+                          }
+                          error={nameError.value}
+                          id="fullName"
+                          name="fullName"
+                          value={name}
+                          onChange={(event) => onChangeHandler(event)}
+                          sx={{
+                            backgroundColor: "white",
+                            borderRadius: "8px",
+                          }}
+                        />
+                      </FormControl>
+                      <FormControl
+                        variant="standard"
+                        fullWidth
+                        sx={{ gap: "10px" }}
+                      >
+                        <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                          Email
+                        </label>
+                        <TextField
+                          autoComplete="off"
+                          onBlur={() => checkInputValidity(email, "email")}
+                          label={
+                            emailError.value ? emailError.message : "Email"
+                          }
+                          type="email"
+                          error={emailError.value}
+                          id="userEmail"
+                          value={email}
+                          name="userEmail"
+                          onChange={(event) => onChangeHandler(event)}
+                          sx={{
+                            backgroundColor: "white",
+                            borderRadius: "8px",
+                          }}
+                        />
+                      </FormControl>
+                      <FormControl
+                        variant="standard"
+                        fullWidth
+                        sx={{ gap: "10px" }}
+                      >
+                        <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                          Password
+                        </label>
+                        <TextField
+                          onBlur={() =>
+                            checkInputValidity(password, "password")
+                          }
+                          label={
+                            passwordError.value
+                              ? passwordError.message
+                              : "Password"
+                          }
+                          type={passType}
+                          error={passwordError.value}
+                          value={password}
+                          id="userPassword"
+                          name="userPassword"
+                          autoComplete="off"
+                          onChange={(event) => onChangeHandler(event)}
+                          slotProps={{
+                            input: {
+                              endAdornment: (
+                                <motion.div whileHover={{ cursor: "pointer" }}>
+                                  <InputAdornment position="end">
+                                    <IconButton onClick={visiblityHandler}>
+                                      {passwordVisible ? (
+                                        <Visibility />
+                                      ) : (
+                                        <VisibilityOff />
+                                      )}
+                                    </IconButton>
+                                  </InputAdornment>
+                                </motion.div>
+                              ),
+                            },
+                          }}
+                          sx={{
+                            backgroundColor: "white",
+                            borderRadius: "8px",
+                          }}
+                        />
+                      </FormControl>
+                      <FormControl
+                        variant="standard"
+                        fullWidth
+                        sx={{ gap: "10px" }}
+                      >
+                        <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                          Confirm Password
+                        </label>
+                        <TextField
+                          onBlur={() =>
+                            checkInputValidity(
+                              confirmPassword,
+                              "confirmPassword"
+                            )
+                          }
+                          label={
+                            confirmPasswordError.value
+                              ? confirmPasswordError.message
+                              : "Confirm Password"
+                          }
+                          error={confirmPasswordError.value}
+                          autoComplete="off"
+                          value={confirmPassword}
+                          id="confirmPassword"
+                          name="confirmPassword"
+                          onChange={(event) => onChangeHandler(event)}
+                          sx={{
+                            backgroundColor: "white",
+                            borderRadius: "8px",
+                          }}
+                        />
+                      </FormControl>
+                    </Grid2>
+                    <Grid2 textAlign="center" marginTop="10px">
+                      <Button
+                        disabled={incompleteForm}
+                        type="submit"
+                        onClick={beforeSubmitHandler}
+                      >
+                        Submit
+                      </Button>
+                    </Grid2>
+                  </Form>
+                </Grid2>
               </Grid2>
             </Grid2>
-          </Grid2>
+          </motion.div>
         </Box>
       </Box>
-      <Divider sx={{marginTop:"2rem"}}/>
+      <Divider sx={{ marginTop: "2rem" }} />
       <Box sx={{ marginTop: "2rem" }}>
         <Footer />
       </Box>
