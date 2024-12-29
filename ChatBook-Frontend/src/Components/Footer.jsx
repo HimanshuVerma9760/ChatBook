@@ -1,18 +1,19 @@
 import React from "react";
-import { Box, Typography, Link } from "@mui/material";
+import { Box, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <Box component="footer" sx={{width:'100%'}}>
+    <Box component="footer" sx={{ width: "100%" }}>
       <Typography variant="body1" align="center">
-        © {new Date().getFullYear()} Your Company Name
+        © {new Date().getFullYear()} ChatBook by Himanshu
       </Typography>
       <Typography variant="body2" align="center" color="grey">
-        <Link href="https://example.com" color="inherit">
+        <Link to="/" style={{ color: "inherit" }}>
           Privacy Policy
         </Link>{" "}
         |{" "}
-        <Link href="https://example.com" color="inherit">
+        <Link to="/" style={{ color: "inherit" }}>
           Terms of Service
         </Link>
       </Typography>

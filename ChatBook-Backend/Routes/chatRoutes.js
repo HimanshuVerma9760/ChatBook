@@ -6,6 +6,7 @@ const {
 } = require("../Controller/messagesController");
 const { addNewUser } = require("../Controller/addUserController");
 const { body, validationResult } = require("express-validator");
+const { userLogin } = require("../Controller/userLoginController");
 
 router.get("/", getMessages);
 
@@ -43,4 +44,5 @@ router.post(
   addNewUser
 );
 
+router.get("/user-login", userLogin);
 exports.router = router;

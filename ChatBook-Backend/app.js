@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const { db } = require("./util/database");
-const { router } = require("./Routes/chatRoutes");
+const { router } = require("./Routes/ChatRoutes");
 
 dotenv.config();
 

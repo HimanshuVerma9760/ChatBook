@@ -5,17 +5,112 @@ import {
   FormControl,
   FormLabel,
   Grid2,
+  IconButton,
   TextField,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import { Form, Link, useActionData } from "react-router-dom";
 import Footer from "./Footer";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 export default function LoginPage() {
-  const response = useActionData || {};
+  const response = useActionData() || {};
   const message = response.message || "";
 
+  const smallScreen = useMediaQuery("(max-width:1050px)");
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [passType, setPassType] = useState("password");
+  const [incompleteForm, setIncompleteForm] = useState(true);
+
+  const [emailError, setEmailError] = useState({
+    value: false,
+    message: "",
+  });
+  const [passwordError, setPasswordError] = useState({
+    value: false,
+    message: "",
+  });
+
+  function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  function checkInputValidity(inputValue, inputType) {
+    switch (inputType) {
+      case "email":
+        if (inputValue.trim().length === 0) {
+          !incompleteForm && setIncompleteForm(true);
+          setEmailError({
+            value: true,
+            message: "Empty Field",
+          });
+        } else {
+          if (!isValidEmail(inputValue)) {
+            !incompleteForm && setIncompleteForm(true);
+            setEmailError({
+              value: true,
+              message: "Invalid Email",
+            });
+          }
+        }
+        break;
+      case "password":
+        if (inputValue.trim().length === 0) {
+          !incompleteForm && setIncompleteForm(true);
+          setPasswordError({
+            value: true,
+            message: "Empty Field",
+          });
+        }
+        break;
+    }
+  }
+
+  function onChangeHandler(event) {
+    const id = event.target.id;
+    const value = event.target.value;
+
+    incompleteForm && setIncompleteForm(false);
+
+    switch (id) {
+      case "userEmail":
+        setEmailError({
+          value: false,
+          message: "",
+        });
+        setEmail(value);
+        break;
+      case "userPassword":
+        setPasswordError({
+          value: false,
+          message: "",
+        });
+        setPassword(value);
+        break;
+      default:
+        break;
+    }
+  }
+
+  function togglePassword() {
+    setPasswordVisible((prevState) => !prevState);
+    setPassType((prevState) => (prevState === "text" ? "password" : "text"));
+  }
+
+  function beforeSubmitHandler(event) {
+    checkInputValidity(email, "email");
+    checkInputValidity(password, "password");
+    if (emailError.value || passwordError.value) {
+      event.preventDefault();
+    }
+  }
   return (
     <>
       <Box
@@ -27,7 +122,12 @@ export default function LoginPage() {
           color: "#4B0082",
         }}
       >
-        <Box sx={{ textAlign: "center", width: { xs: "100%", sm: "50%" } }}>
+        <Box
+          sx={{
+            textAlign: "center",
+            width: { xs: "100%", sm: `${smallScreen ? "70" : "50%"}` },
+          }}
+        >
           <Grid2
             sx={{
               display: "flex",
@@ -39,7 +139,10 @@ export default function LoginPage() {
               <Typography
                 variant="h3"
                 sx={{
-                  fontSize: { xs: "26px", sm: "45px" },
+                  fontSize: {
+                    xs: "26px",
+                    sm: `${smallScreen ? "38px" : "45px"}`,
+                  },
                   fontWeight: "bold",
                 }}
               >
@@ -47,7 +150,12 @@ export default function LoginPage() {
               </Typography>
               <Typography
                 variant="p"
-                sx={{ fontSize: { xs: "11.5px", sm: "20px" } }}
+                sx={{
+                  fontSize: {
+                    xs: "11.5px",
+                    sm: `${smallScreen ? "15px" : "20px"}`,
+                  },
+                }}
               >
                 We’re excited to have you back with us. Please login to get
                 started and explore all new features.
@@ -57,7 +165,12 @@ export default function LoginPage() {
               <Typography
                 variant="h5"
                 fontWeight={580}
-                sx={{ fontSize: { sm: "32px", xs: "18px" } }}
+                sx={{
+                  fontSize: {
+                    sm: `${smallScreen ? "24px" : "32px"}`,
+                    xs: "18px",
+                  },
+                }}
                 align="center"
               >
                 Don't have an account?
@@ -65,7 +178,10 @@ export default function LoginPage() {
               <Typography
                 variant="p"
                 sx={{
-                  fontSize: { xs: "13px", sm: "15px" },
+                  fontSize: {
+                    xs: "13px",
+                    sm: `${smallScreen ? "12px" : "15px"}`,
+                  },
                   marginLeft: "0.5rem",
                 }}
               >
@@ -100,7 +216,10 @@ export default function LoginPage() {
                         display: "flex",
                         flexDirection: "column",
                         gap: "1rem",
-                        width: { xs: "20rem", sm: "30rem" },
+                        width: {
+                          xs: "20rem",
+                          sm: `${smallScreen ? "25rem" : "30rem"}`,
+                        },
                       }}
                     >
                       <FormControl
@@ -112,9 +231,18 @@ export default function LoginPage() {
                           Email
                         </label>
                         <TextField
-                          label="Email"
+                          onBlur={(event) =>
+                            checkInputValidity(event.target.value, "email")
+                          }
+                          error={emailError.value}
+                          autoComplete="off"
+                          label={
+                            emailError.value ? emailError.message : "Email"
+                          }
                           type="email"
                           id="userEmail"
+                          value={email}
+                          onChange={onChangeHandler}
                           name="userEmail"
                           sx={{
                             backgroundColor: "white",
@@ -131,10 +259,34 @@ export default function LoginPage() {
                           Password
                         </label>
                         <TextField
-                          type="password"
-                          label="Password"
+                          onBlur={(event) =>
+                            checkInputValidity(event.target.value, "password")
+                          }
+                          autoComplete="off"
+                          error={passwordError.value}
+                          type={passType}
+                          label={
+                            passwordError.value
+                              ? passwordError.message
+                              : "Password"
+                          }
+                          value={password}
+                          onChange={onChangeHandler}
                           id="userPassword"
                           name="userPassword"
+                          slotProps={{
+                            input: {
+                              endAdornment: (
+                                <IconButton onClick={togglePassword}>
+                                  {!passwordVisible ? (
+                                    <VisibilityOff />
+                                  ) : (
+                                    <Visibility />
+                                  )}
+                                </IconButton>
+                              ),
+                            },
+                          }}
                           sx={{
                             backgroundColor: "white",
                             borderRadius: "8px",
@@ -143,7 +295,13 @@ export default function LoginPage() {
                       </FormControl>
                     </Grid2>
                     <Grid2 textAlign="center" marginTop="10px">
-                      <Button type="submit">Submit</Button>
+                      <Button
+                        disabled={incompleteForm}
+                        onClick={(event) => beforeSubmitHandler(event)}
+                        type="submit"
+                      >
+                        Submit
+                      </Button>
                     </Grid2>
                   </Form>
                 </Grid2>

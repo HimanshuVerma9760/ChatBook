@@ -21,7 +21,7 @@ export default async function FormAction({ request }) {
       if (!response.ok) {
         return { message: "Some error occured while saving data!" };
       } else {
-        const backendResponse=await response.json();
+        const backendResponse = await response.json();
         return { message: backendResponse.message };
       }
     } else {
