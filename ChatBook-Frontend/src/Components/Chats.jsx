@@ -2,15 +2,24 @@ import { Button } from "@mui/material";
 import { Send } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import openSocket from "socket.io-client";
+// import { useAuth } from "../utils/Auth";
+// import { useNavigate } from "react-router-dom";
 const backendAPI = import.meta.env.VITE_BACKEND_API;
 
-export default function Chat() {
+export default function Chats() {
   const [myMessages, setMyMessages] = useState(null);
   const [userName, setUserName] = useState("User1");
   const [text, setText] = useState("");
   const [isChangingUserName, setIsChangingUserName] = useState(false);
 
+  // const isAuth=useAuth();
+  // const navigate=useNavigate();
+
+
   useEffect(() => {
+    if(!isAuth){
+      navigate('/login');
+    }
     const socket = openSocket(`${backendAPI}`);
     async function getMessages() {
       const response = await fetch(`${backendAPI}`);

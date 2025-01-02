@@ -10,15 +10,21 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import { Form, Link, useActionData } from "react-router-dom";
+import { Form, Link, useActionData, useNavigate } from "react-router-dom";
 import Footer from "./Footer";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 export default function LoginPage() {
   const response = useActionData() || {};
   const message = response.message || "";
+  const isAuth = response.isAuth || false;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuth) navigate("/dashboard");
+  }, [isAuth]);
 
   const smallScreen = useMediaQuery("(max-width:1050px)");
 
@@ -105,12 +111,20 @@ export default function LoginPage() {
   }
 
   function beforeSubmitHandler(event) {
-    checkInputValidity(email, "email");
-    checkInputValidity(password, "password");
-    if (emailError.value || passwordError.value) {
+    const emailValid = isValidEmail(email);
+    const passwordValid = password.trim().length > 0;
+
+    if (!emailValid || !passwordValid) {
       event.preventDefault();
+      if (!emailValid) {
+        setEmailError({ value: true, message: "Invalid Email" });
+      }
+      if (!passwordValid) {
+        setPasswordError({ value: true, message: "Empty Field" });
+      }
     }
   }
+
   return (
     <>
       <Box
