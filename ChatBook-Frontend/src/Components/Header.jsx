@@ -3,6 +3,7 @@ import {
   Home,
   ListOutlined,
   Login,
+  Logout,
   Message,
   Notifications,
   Search,
@@ -25,15 +26,26 @@ import {
   Input,
   InputAdornment,
   useMediaQuery,
+  IconButton,
 } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
-import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  Outlet,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import { motion } from "framer-motion";
+import toast, { Toaster } from "react-hot-toast";
+import { debounce } from "lodash";
 
 export default function Header() {
   const [sideBar, setSideBar] = useState(false);
   const minScreenSize = useMediaQuery("(min-width:1275px)");
 
+  const pathname = useLocation().pathname;
+  const navigation = useNavigate();
   const navigate = useParams();
   const optionArray = [
     {
@@ -49,13 +61,20 @@ export default function Header() {
     { label: "Help", icon: <Help key="help" />, to: "/help" },
     { label: "Message", icon: <Message key="message" />, to: "/messages" },
     { label: "Settings", icon: <Settings key="settings" />, to: "/settings" },
-    { label: "Login", icon: <Login key="login" />, to: "/login" },
+    { label: "Login", icon: <Login key="login" />, to: "/" },
   ];
-
+  const redirect = debounce(() => {
+    navigation("/");
+  }, 1700);
   useEffect(() => {
     setSideBar(false);
   }, [navigate]);
 
+  function logoutHandler() {
+    localStorage.clear();
+    toast.loading("Logging out...", { duration: 1500 });
+    redirect();
+  }
   const DrawerList = (
     <Box width={250} role="presentation">
       <List>
@@ -96,103 +115,105 @@ export default function Header() {
             alignItems: { xs: "center", sm: "inherit" },
           }}
         >
+          <Toaster />
           <Grid2>
-            <motion.div
+            {/* <motion.div
               initial={{ y: "-100px" }}
               animate={{ y: "0px" }}
               transition={{ duration: 0.3, type: "spring" }}
+            > */}
+            <Grid2
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
             >
-              <Grid2
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Grid2 container>
-                  <Typography
-                    component="h5"
-                    sx={{
-                      color: "white",
-                      fontSize: { xs: "20px", sm: "25px", textAlign: "center" },
-                    }}
-                  >
-                    Welcome To Your Personal Chat Space
-                  </Typography>
-                </Grid2>
-                {minScreenSize && (
-                  <Grid2>
-                    <Input
-                      type="search"
-                      placeholder="Search"
-                      startAdornment={
-                        <InputAdornment position="start">
-                          <Search sx={{ marginRight: "10px" }} />
-                        </InputAdornment>
-                      }
-                      disableUnderline
-                      sx={{
-                        border: "transparent",
-                        width: "30rem",
-                        borderRadius: "1.8rem",
-                        backgroundColor: "white",
-                        paddingLeft: "1rem",
-                        fontSize: "15px",
-                        height: "2.5rem",
-                      }}
-                    ></Input>
-                  </Grid2>
-                )}
-
-                <Typography>
-                  <List sx={{ display: { xs: "none", sm: "flex" } }}>
-                    <motion.div whileHover={{ scale: 1.2 }}>
-                      <ListItem>
-                        <Link to="/" style={{ color: "white" }}>
-                          <Home />
-                        </Link>
-                      </ListItem>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.2 }}>
-                      <ListItem>
-                        <Link to="/notifications" style={{ color: "white" }}>
-                          <Notifications />
-                        </Link>
-                      </ListItem>
-                    </motion.div>
-
-                    <motion.div whileHover={{ scale: 1.2 }}>
-                      <ListItem>
-                        <Link to="/help" style={{ color: "white" }}>
-                          <Help />
-                        </Link>
-                      </ListItem>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.2 }}>
-                      <ListItem>
-                        <Link to="/messages" style={{ color: "white" }}>
-                          <Message />
-                        </Link>
-                      </ListItem>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.2 }}>
-                      <ListItem>
-                        <Link to="/settings" style={{ color: "white" }}>
-                          <Settings />
-                        </Link>
-                      </ListItem>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.2 }}>
-                      <ListItem>
-                        <Link style={{ color: "white" }} to="/login">
-                          <Login />
-                        </Link>
-                      </ListItem>
-                    </motion.div>
-                  </List>
+              <Grid2 container>
+                <Typography
+                  component="h5"
+                  sx={{
+                    color: "white",
+                    fontSize: { xs: "20px", sm: "25px", textAlign: "center" },
+                    // paddingRight:"0.3rem"
+                  }}
+                >
+                  Your Personal Chat Space
                 </Typography>
               </Grid2>
-            </motion.div>
+              {minScreenSize && (
+                <Grid2>
+                  <Input
+                    type="search"
+                    placeholder="Search"
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <Search sx={{ marginRight: "10px" }} />
+                      </InputAdornment>
+                    }
+                    disableUnderline
+                    sx={{
+                      border: "transparent",
+                      width: "30rem",
+                      borderRadius: "1.8rem",
+                      backgroundColor: "white",
+                      paddingLeft: "1rem",
+                      fontSize: "15px",
+                      height: "2.5rem",
+                    }}
+                  ></Input>
+                </Grid2>
+              )}
+
+              <Typography>
+                <List sx={{ display: { xs: "none", sm: "flex" } }}>
+                  <motion.div whileHover={{ scale: 1.2 }}>
+                    <ListItem>
+                      <Link to="/" style={{ color: "white" }}>
+                        <Home />
+                      </Link>
+                    </ListItem>
+                  </motion.div>
+                  <motion.div whileHover={{ scale: 1.2 }}>
+                    <ListItem>
+                      <Link to="/notifications" style={{ color: "white" }}>
+                        <Notifications />
+                      </Link>
+                    </ListItem>
+                  </motion.div>
+
+                  <motion.div whileHover={{ scale: 1.2 }}>
+                    <ListItem>
+                      <Link to="/help" style={{ color: "white" }}>
+                        <Help />
+                      </Link>
+                    </ListItem>
+                  </motion.div>
+                  <motion.div whileHover={{ scale: 1.2 }}>
+                    <ListItem>
+                      <Link to="/messages" style={{ color: "white" }}>
+                        <Message />
+                      </Link>
+                    </ListItem>
+                  </motion.div>
+                  <motion.div whileHover={{ scale: 1.2 }}>
+                    <ListItem>
+                      <Link to="/settings" style={{ color: "white" }}>
+                        <Settings />
+                      </Link>
+                    </ListItem>
+                  </motion.div>
+                  <motion.div whileHover={{ scale: 1.2 }}>
+                    {pathname.split("/")[1] === "dashboard" && (
+                      <IconButton onClick={logoutHandler}>
+                        <Logout sx={{ color: "white" }} />
+                      </IconButton>
+                    )}
+                  </motion.div>
+                </List>
+              </Typography>
+            </Grid2>
+            {/* </motion.div> */}
           </Grid2>
         </AppBar>
 
@@ -223,12 +244,12 @@ export default function Header() {
               {DrawerList}
             </Drawer>
           </Box>
-          <Box sx={{ marginTop: "1rem", padding: "1rem" }}>
-            <Grid2 width="100%">
-              <Outlet />
-            </Grid2>
-          </Box>
         </Box>
+      </Box>
+      <Box sx={{ padding: "1rem" }}>
+        {/* <Grid2> */}
+        <Outlet />
+        {/* </Grid2> */}
       </Box>
     </>
   );

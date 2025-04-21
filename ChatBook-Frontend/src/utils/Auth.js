@@ -1,34 +1,36 @@
 // import { useState } from "react";
 // import { useNavigate } from "react-router-dom";
 
-const backendApi = import.meta.env.VITE_BACKEND_API;
+import { redirect } from "react-router-dom";
 
-export async function Auth() {
+const backendApi = import.meta.env.VITE_BACKEND_URL;
+
+export default async function Auth() {
+  // return { isAuth: true };
   const token = localStorage.getItem("token");
-
   if (!token) {
-    return { isAuth: false };
+    return { response: false, data: null };
   }
 
   try {
-    const response = await fetch(`${backendApi}/dashboard`, {
+    const response = await fetch(`${backendApi}/auth/verify`, {
       method: "GET",
       headers: {
         authorization: `Bearer ${token}`,
       },
     });
 
-    if (response.ok) {
-      console.log("Valid token");
-      return { isAuth: true };
-    } else {
+    if (!response.ok) {
       console.log("Invalid token");
       localStorage.removeItem("token");
-      return { isAuth: false };
+      return { response: false, data: null };
+    } else {
+      const user = await response.json();
+      return { response: true, data: user };
     }
   } catch (error) {
     console.error("Error during authentication check:", error);
     localStorage.removeItem("token");
-    return { isAuth: false };
+    return { response: false, data: null };
   }
 }

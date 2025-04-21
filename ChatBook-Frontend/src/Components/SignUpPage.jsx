@@ -1,7 +1,19 @@
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import {
+  Check,
+  CheckCircle,
+  CheckCircleOutline,
+  TaskAlt,
+  TaskAltOutlined,
+  TaskAltRounded,
+  Verified,
+  VerifiedOutlined,
+  Visibility,
+  VisibilityOff,
+} from "@mui/icons-material";
 import {
   Box,
   Button,
+  CircularProgress,
   Divider,
   FormControl,
   FormLabel,
@@ -9,108 +21,163 @@ import {
   IconButton,
   InputAdornment,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Form, Link, useActionData } from "react-router-dom";
+import { Form, Link, useActionData, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Footer from "./Footer";
+import { toast, Toaster } from "react-hot-toast";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import signup from "../utils/API/http";
+import { debounce } from "lodash";
+const Conn = import.meta.env.VITE_BACKEND_URL;
 
 export default function SignUpPage() {
-  const response = useActionData() || {};
-  const message = response.message || null;
-
-  const [nameError, setNameError] = useState({
-    value: false,
-    message: "",
+  const navigate = useNavigate();
+  const [error, setError] = useState({
+    nameError: {
+      state: false,
+      message: "",
+    },
+    emailError: {
+      state: false,
+      message: "",
+    },
+    passwordError: {
+      state: false,
+      message: "",
+    },
+    confirmPasswordError: {
+      state: false,
+      message: "",
+    },
+    userNameError: {
+      state: false,
+      message: "",
+    },
   });
-  const [emailError, setEmailError] = useState({
-    value: false,
-    message: "",
-  });
-  const [passwordError, setPasswordError] = useState({
-    value: false,
-    message: "",
-  });
-  const [confirmPasswordError, setConfirmPasswordError] = useState({
-    value: false,
-    message: "",
-  });
-
+  const redirect = debounce(() => {
+    navigate("/");
+  }, 2000);
   const [name, setName] = useState("");
+  const [userName, setUsername] = useState("");
+  const [hasUsername, setHasUsername] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [passType, setPassType] = useState("password");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [incompleteForm, setIncompleteForm] = useState(true);
+  const [isChecking, setIsChecking] = useState(false);
 
-  useEffect(() => {
-    setName("");
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-    setNameError({
-      value: false,
-      message: "",
-    });
-    setEmailError({
-      value: false,
-      message: "",
-    });
-    setPasswordError({
-      value: false,
-      message: "",
-    });
-    setConfirmPasswordError({
-      value: false,
-      message: "",
-    });
-    setPasswordVisible(false);
-    setPassType("password");
-    setIncompleteForm(true);
-  }, [message]);
-
+  const { mutate } = useMutation({
+    mutationFn: signup,
+    onSuccess: (data) => {
+      toast.dismiss();
+      toast.loading("Successfully registered! redirecting to login page...", {
+        duration: 1900,
+      });
+      redirect();
+    },
+    onError: (error) => {
+      toast.dismiss();
+      console.log("error.......", error.status);
+      if (error.status === 409) {
+        toast.error("Email already registered!");
+      } else {
+        toast.error(error.message);
+      }
+    },
+  });
+  function submitHandler() {
+    const userData = {
+      name: name,
+      email: email,
+      password: password,
+      username: userName,
+    };
+    toast.promise(
+      mutate({ userData }),
+      {
+        loading: "Please wait...",
+      },
+      {
+        style: {
+          minWidth: "250px",
+        },
+        loading: {
+          duration: 3000,
+        },
+      }
+    );
+  }
   function onChangeHandler(event) {
-    setIncompleteForm(false);
     const id = event.target.id;
     const value = event.target.value;
     switch (id) {
       case "fullName":
-        setNameError(() => {
-          return {
-            value: false,
-            message: "",
-          };
-        });
+        if (error.nameError.state) {
+          setError((prevState) => ({
+            ...prevState,
+            nameError: {
+              state: false,
+              message: "",
+            },
+          }));
+        }
         setName(value);
         break;
       case "userEmail":
-        setEmailError(() => {
-          return {
-            value: false,
-            message: "",
-          };
-        });
+        if (error.emailError.state) {
+          setError((prevState) => ({
+            ...prevState,
+            emailError: {
+              state: false,
+              message: "",
+            },
+          }));
+        }
         setEmail(value);
         break;
       case "userPassword":
-        setPasswordError(() => {
-          return {
-            value: false,
-            message: "",
-          };
-        });
+        if (error.passwordError.state) {
+          setError((prevState) => ({
+            ...prevState,
+            passwordError: {
+              state: false,
+              message: "",
+            },
+          }));
+        }
         setPassword(value);
         break;
       case "confirmPassword":
-        setConfirmPasswordError(() => {
-          return {
-            value: false,
-            message: "",
-          };
-        });
+        if (error.confirmPasswordError.state) {
+          setError((prevState) => ({
+            ...prevState,
+            confirmPasswordError: {
+              state: false,
+              message: "",
+            },
+          }));
+        }
         setConfirmPassword(value);
+        break;
+      case "userName":
+        if (error.userNameError.state) {
+          setError((prevState) => ({
+            ...prevState,
+            userNameError: {
+              state: false,
+              message: "",
+            },
+          }));
+        }
+        if (hasUsername) {
+          setHasUsername(false);
+        }
+        setUsername(value);
         break;
       default:
         break;
@@ -121,95 +188,143 @@ export default function SignUpPage() {
     return emailRegex.test(email);
   }
 
-  function checkInputValidity(inputValue, inputType) {
-    switch (inputType) {
-      case "name":
-        if (inputValue.trim().length === 0) {
-          !incompleteForm && setIncompleteForm(true);
-          setNameError(() => {
-            return {
-              value: true,
-              message: "Empty Name Field",
-            };
-          });
+  function blurHandler(event) {
+    const key = event.target.id;
+    const value = event.target.value;
+    switch (key) {
+      case "fullName":
+        if (value.trim().length === 0) {
+          setError((prevState) => ({
+            ...prevState,
+            nameError: {
+              state: true,
+              message: "Empty field",
+            },
+          }));
         } else {
-          const nameArr = inputValue.split("");
+          const nameArr = value.split("");
           for (const ch of nameArr) {
             if (!isNaN(ch)) {
               if (ch !== " ") {
-                !incompleteForm && setIncompleteForm(true);
-                setNameError(() => {
-                  return {
-                    value: true,
-                    message: "Name must not contain a number!",
-                  };
-                });
+                // !incompleteForm && setIncompleteForm(true);
+                setError((prevState) => ({
+                  ...prevState,
+                  nameError: {
+                    state: true,
+                    message: "Name must not contain numbers",
+                  },
+                }));
               }
             }
           }
         }
         break;
-      case "email":
-        if (inputValue.trim().length === 0) {
-          !incompleteForm && setIncompleteForm(true);
-          setEmailError(() => {
-            return {
-              value: true,
-              message: "Empty Email Field",
-            };
-          });
+      case "userEmail":
+        if (value.trim().length === 0) {
+          setError((prevState) => ({
+            ...prevState,
+            emailError: {
+              state: true,
+              message: "Empty field",
+            },
+          }));
         } else {
-          if (!isValidEmail(inputValue)) {
-            !incompleteForm && setIncompleteForm(true);
-            setEmailError(() => {
-              return {
-                value: true,
-                message: "Invalid Email!",
-              };
-            });
+          if (!isValidEmail(value)) {
+            setError((prevState) => ({
+              ...prevState,
+              emailError: {
+                state: true,
+                message: "Invalid email provided",
+              },
+            }));
           }
         }
         break;
       case "password":
-        if (inputValue.trim().length === 0) {
-          !incompleteForm && setIncompleteForm(true);
-          setPasswordError(() => {
-            return {
-              value: true,
-              message: "Empty Password Field",
-            };
-          });
-        } else if (inputValue.trim().length < 8) {
-          !incompleteForm && setIncompleteForm(true);
-          setPasswordError(() => {
-            return {
-              value: true,
-              message: "Password length should be atleast 8 character long!",
-            };
-          });
+        if (value.trim().length === 0) {
+          setError((prevState) => ({
+            ...prevState,
+            passwordError: {
+              state: true,
+              message: "Password cannot be empty",
+            },
+          }));
+        } else if (value.trim().length < 8) {
+          setError((prevState) => ({
+            ...prevState,
+            passwordError: {
+              state: true,
+              message: "Password must contain atleast 8 characters",
+            },
+          }));
         }
         break;
       case "confirmPassword":
-        if (inputValue.trim().length === 0) {
-          !incompleteForm && setIncompleteForm(true);
-          setConfirmPasswordError(() => {
-            return {
-              value: true,
-              message: "Empty Field",
-            };
-          });
-        } else if (inputValue.trim() !== password) {
-          !incompleteForm && setIncompleteForm(true);
-          setConfirmPasswordError(() => {
-            return {
-              value: true,
-              message: "Password Missmatched!",
-            };
-          });
+        if (value.trim().length === 0) {
+          setError((prevState) => ({
+            ...prevState,
+            confirmPasswordError: {
+              state: true,
+              message: "Empty field",
+            },
+          }));
+        } else if (value.trim() !== password) {
+          setError((prevState) => ({
+            ...prevState,
+            confirmPasswordError: {
+              state: true,
+              message: "Password Mismatched",
+            },
+          }));
+        }
+        break;
+      case "userName":
+        if (value.trim().length === 0) {
+          setError((prevState) => ({
+            ...prevState,
+            userNameError: {
+              state: true,
+              message: "Empty field",
+            },
+          }));
+        } else if (value.trim().length < 5 || value.trim().length > 15) {
+          setError((prevState) => ({
+            ...prevState,
+            userNameError: {
+              state: true,
+              message: "Username must be between 5 to 15 characters",
+            },
+          }));
         }
         break;
       default:
         break;
+    }
+  }
+
+  async function checkAvailabilityHandler() {
+    setIsChecking(true);
+    try {
+      const response = await fetch(
+        `${Conn}/users/check-username/?username=${userName}`
+      );
+      if (!response.ok) {
+        setError((prevState) => ({
+          ...prevState,
+          userNameError: {
+            state: true,
+            message: "Username already taken",
+          },
+        }));
+        toast("Username already taken");
+      } else {
+        toast.success("Username accepted!");
+        setHasUsername(true);
+      }
+      setIsChecking(false);
+    } catch (error) {
+      console.log(error);
+      setIsChecking(false);
     }
   }
 
@@ -219,22 +334,6 @@ export default function SignUpPage() {
     );
     setPasswordVisible((prevState) => !prevState);
   }
-
-  function beforeSubmitHandler(event) {
-    checkInputValidity(name, "name");
-    checkInputValidity(email, "email");
-    checkInputValidity(password, "password");
-    checkInputValidity(confirmPassword, "confirmPassword");
-    if (
-      nameError.value ||
-      emailError.value ||
-      passwordError.value ||
-      confirmPasswordError.value
-    ) {
-      event.preventDefault();
-    }
-  }
-
   return (
     <>
       <Box
@@ -247,6 +346,7 @@ export default function SignUpPage() {
           overflow: "hidden",
         }}
       >
+        <Toaster />
         <Box sx={{ textAlign: "center", width: { xs: "100%", sm: "50%" } }}>
           <Grid2
             sx={{
@@ -285,14 +385,9 @@ export default function SignUpPage() {
                 variant="p"
                 sx={{ fontSize: { xs: "13px", sm: "15px" } }}
               >
-                <Link to="/login">Login here</Link>
+                <Link to="/">Login here</Link>
               </Typography>
             </Grid2>
-            {message && (
-              <Typography variant="p" color="error">
-                {message}
-              </Typography>
-            )}
           </Grid2>
         </Box>
         <Box>
@@ -310,156 +405,235 @@ export default function SignUpPage() {
                   </Typography>
                 </Grid2>
                 <Grid2>
-                  <Form method="post">
-                    <Grid2
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "1rem",
-                        width: { xs: "20rem", sm: "30rem" },
-                      }}
+                  {/* <Form method="post"> */}
+                  <Grid2
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "1rem",
+                      width: { xs: "20rem", sm: "30rem" },
+                    }}
+                  >
+                    <FormControl
+                      variant="standard"
+                      fullWidth
+                      sx={{ gap: "10px" }}
                     >
-                      <FormControl
-                        variant="standard"
-                        fullWidth
-                        sx={{ gap: "10px" }}
-                      >
-                        <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                      {/* <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
                           Full Name
-                        </label>
-                        <TextField
-                          onBlur={() => checkInputValidity(name, "name")}
-                          autoComplete="off"
-                          label={
-                            nameError.value ? nameError.message : "Full Name"
-                          }
-                          error={nameError.value}
-                          id="fullName"
-                          name="fullName"
-                          value={name}
-                          onChange={(event) => onChangeHandler(event)}
-                          sx={{
-                            backgroundColor: "white",
-                            borderRadius: "8px",
-                          }}
-                        />
-                      </FormControl>
-                      <FormControl
-                        variant="standard"
-                        fullWidth
-                        sx={{ gap: "10px" }}
-                      >
-                        <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
-                          Email
-                        </label>
-                        <TextField
-                          autoComplete="off"
-                          onBlur={() => checkInputValidity(email, "email")}
-                          label={
-                            emailError.value ? emailError.message : "Email"
-                          }
-                          type="email"
-                          error={emailError.value}
-                          id="userEmail"
-                          value={email}
-                          name="userEmail"
-                          onChange={(event) => onChangeHandler(event)}
-                          sx={{
-                            backgroundColor: "white",
-                            borderRadius: "8px",
-                          }}
-                        />
-                      </FormControl>
-                      <FormControl
-                        variant="standard"
-                        fullWidth
-                        sx={{ gap: "10px" }}
-                      >
-                        <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
-                          Password
-                        </label>
-                        <TextField
-                          onBlur={() =>
-                            checkInputValidity(password, "password")
-                          }
-                          label={
-                            passwordError.value
-                              ? passwordError.message
-                              : "Password"
-                          }
-                          type={passType}
-                          error={passwordError.value}
-                          value={password}
-                          id="userPassword"
-                          name="userPassword"
-                          autoComplete="off"
-                          onChange={(event) => onChangeHandler(event)}
-                          slotProps={{
-                            input: {
-                              endAdornment: (
-                                <motion.div whileHover={{ cursor: "pointer" }}>
-                                  <InputAdornment position="end">
-                                    <IconButton onClick={visiblityHandler}>
-                                      {passwordVisible ? (
-                                        <Visibility />
+                        </label> */}
+                      <TextField
+                        size="small"
+                        onBlur={(event) => blurHandler(event)}
+                        autoComplete="off"
+                        autoFocus
+                        label={
+                          error.userNameError.state
+                            ? error.userNameError.message
+                            : "Username"
+                        }
+                        error={error.userNameError.state}
+                        id="userName"
+                        name="userName"
+                        value={userName}
+                        onChange={(event) => onChangeHandler(event)}
+                        sx={{
+                          backgroundColor: "white",
+                          borderRadius: "8px",
+                        }}
+                        slotProps={{
+                          input: {
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                {isChecking ? (
+                                  <CircularProgress size={20} />
+                                ) : (
+                                  <Tooltip
+                                    title={
+                                      hasUsername
+                                        ? "Verified"
+                                        : "Check availability"
+                                    }
+                                  >
+                                    <IconButton
+                                      size="small"
+                                      onClick={checkAvailabilityHandler}
+                                      disabled={
+                                        hasUsername || error.userNameError.state
+                                      }
+                                    >
+                                      {hasUsername ? (
+                                        <CheckCircle />
                                       ) : (
-                                        <VisibilityOff />
+                                        <CheckCircleOutline />
                                       )}
                                     </IconButton>
-                                  </InputAdornment>
-                                </motion.div>
-                              ),
-                            },
-                          }}
-                          sx={{
-                            backgroundColor: "white",
-                            borderRadius: "8px",
-                          }}
-                        />
-                      </FormControl>
-                      <FormControl
-                        variant="standard"
-                        fullWidth
-                        sx={{ gap: "10px" }}
-                      >
-                        <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                                  </Tooltip>
+                                )}
+                              </InputAdornment>
+                            ),
+                          },
+                        }}
+                      />
+                      <Typography variant="caption">
+                        Check username availability first
+                      </Typography>
+                    </FormControl>
+                    <FormControl
+                      variant="standard"
+                      fullWidth
+                      sx={{ gap: "10px" }}
+                    >
+                      {/* <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                          Full Name
+                        </label> */}
+                      <TextField
+                        size="small"
+                        disabled={!hasUsername}
+                        onBlur={(event) => blurHandler(event)}
+                        autoComplete="off"
+                        label={
+                          error.nameError.state
+                            ? error.nameError.message
+                            : "Full Name"
+                        }
+                        error={error.nameError.state}
+                        id="fullName"
+                        name="fullName"
+                        value={name}
+                        onChange={(event) => onChangeHandler(event)}
+                        sx={{
+                          backgroundColor: "white",
+                          borderRadius: "8px",
+                        }}
+                      />
+                    </FormControl>
+                    <FormControl
+                      variant="standard"
+                      fullWidth
+                      sx={{ gap: "10px" }}
+                    >
+                      {/* <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                          Email
+                        </label> */}
+                      <TextField
+                        size="small"
+                        disabled={!hasUsername}
+                        autoComplete="off"
+                        onBlur={(event) => blurHandler(event)}
+                        label={
+                          error.emailError.state
+                            ? error.emailError.message
+                            : "Email"
+                        }
+                        type="email"
+                        error={error.emailError.state}
+                        id="userEmail"
+                        value={email}
+                        name="userEmail"
+                        onChange={(event) => onChangeHandler(event)}
+                        sx={{
+                          backgroundColor: "white",
+                          borderRadius: "8px",
+                        }}
+                      />
+                    </FormControl>
+                    <FormControl
+                      variant="standard"
+                      fullWidth
+                      sx={{ gap: "10px" }}
+                    >
+                      {/* <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
+                          Password
+                        </label> */}
+                      <TextField
+                        size="small"
+                        onBlur={(event) => blurHandler(event)}
+                        disabled={!hasUsername}
+                        label={
+                          error.passwordError.state
+                            ? error.passwordError.message
+                            : "Password"
+                        }
+                        type={passType}
+                        error={error.passwordError.state}
+                        value={password}
+                        id="userPassword"
+                        name="userPassword"
+                        autoComplete="off"
+                        onChange={(event) => onChangeHandler(event)}
+                        slotProps={{
+                          input: {
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <IconButton
+                                  size="small"
+                                  onClick={visiblityHandler}
+                                  disabled={!hasUsername}
+                                >
+                                  {passwordVisible ? (
+                                    <Visibility />
+                                  ) : (
+                                    <VisibilityOff />
+                                  )}
+                                </IconButton>
+                              </InputAdornment>
+                            ),
+                          },
+                        }}
+                        sx={{
+                          backgroundColor: "white",
+                          borderRadius: "8px",
+                        }}
+                      />
+                    </FormControl>
+                    <FormControl
+                      variant="standard"
+                      fullWidth
+                      sx={{ gap: "10px" }}
+                    >
+                      {/* <label style={{ fontSize: { xs: "15px", sm: "20px" } }}>
                           Confirm Password
-                        </label>
-                        <TextField
-                          onBlur={() =>
-                            checkInputValidity(
-                              confirmPassword,
-                              "confirmPassword"
-                            )
-                          }
-                          label={
-                            confirmPasswordError.value
-                              ? confirmPasswordError.message
-                              : "Confirm Password"
-                          }
-                          error={confirmPasswordError.value}
-                          autoComplete="off"
-                          value={confirmPassword}
-                          id="confirmPassword"
-                          name="confirmPassword"
-                          onChange={(event) => onChangeHandler(event)}
-                          sx={{
-                            backgroundColor: "white",
-                            borderRadius: "8px",
-                          }}
-                        />
-                      </FormControl>
-                    </Grid2>
-                    <Grid2 textAlign="center" marginTop="10px">
-                      <Button
-                        disabled={incompleteForm}
-                        type="submit"
-                        onClick={beforeSubmitHandler}
-                      >
-                        Submit
-                      </Button>
-                    </Grid2>
-                  </Form>
+                        </label> */}
+                      <TextField
+                        disabled={!hasUsername}
+                        size="small"
+                        onBlur={(event) => blurHandler(event)}
+                        label={
+                          error.confirmPasswordError.state
+                            ? error.confirmPasswordError.message
+                            : "Confirm Password"
+                        }
+                        error={error.confirmPasswordError.state}
+                        autoComplete="off"
+                        value={confirmPassword}
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        onChange={(event) => onChangeHandler(event)}
+                        sx={{
+                          backgroundColor: "white",
+                          borderRadius: "8px",
+                        }}
+                      />
+                    </FormControl>
+                  </Grid2>
+                  <Grid2 textAlign="center" marginTop="10px">
+                    <Button
+                      disabled={
+                        error.nameError.state ||
+                        error.emailError.state ||
+                        error.passwordError.state ||
+                        error.confirmPasswordError.state ||
+                        error.userNameError.state ||
+                        !hasUsername
+                      }
+                      type="button"
+                      onClick={submitHandler}
+                    >
+                      Submit
+                    </Button>
+                  </Grid2>
+                  {/* </Form> */}
                 </Grid2>
               </Grid2>
             </Grid2>
